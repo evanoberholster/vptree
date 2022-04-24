@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	count := 10000000
+	count := 1000000
 
 	vp := vptree.NewVPTree()
 	arr := make([]uint64, 0, count)
@@ -20,25 +20,29 @@ func main() {
 		arr = append(arr, item)
 		vp.Add(item)
 	}
-	fmt.Println(vp)
-	query := uint64(9716099646001308040)
-	tau := uint64(3)
+
+	query := uint64(15480771490665767304)
+	tau := uint64(0)
 	k := 10
 
+	// Run VP Search
 	start := time.Now()
 	res, distances := vp.Search(query, tau, k).Array()
 	elapsed := time.Since(start)
-	start = time.Now()
-	res2, distances2 := vptree.LinearSearch(arr, query, tau, k).Array()
-	elapsed2 := time.Since(start)
 
 	fmt.Println("VPTree Results:", len(res), elapsed)
 	for i, r := range res {
 		fmt.Println("r: ", r, "  \tdist:", distances[i])
 	}
-	fmt.Println("\nLinear Results:", len(res2), elapsed2)
-	for i, r := range res2 {
-		fmt.Println("r: ", r, "  \tdist:", distances2[i])
+
+	// Run Linear Search
+	start = time.Now()
+	res, distances = vptree.LinearSearch(arr, query, tau, k).Array()
+	elapsed = time.Since(start)
+
+	fmt.Println("\nLinear Results:", len(res), elapsed)
+	for i, r := range res {
+		fmt.Println("r: ", r, "  \tdist:", distances[i])
 	}
 
 	PrintMemUsage()

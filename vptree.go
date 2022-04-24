@@ -12,7 +12,7 @@ type VPTree struct {
 
 const (
 	// itemsLimit is the limit of items per node before a split is called
-	itemsLimit = 512
+	itemsLimit = 2048
 )
 
 // NewVPTree returns a new VPTree

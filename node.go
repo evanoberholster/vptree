@@ -27,8 +27,9 @@ func (n *node) search(q uint64, tau *uint64, k int, r *Results) {
 		}
 	} else {
 		d := distance(n.items[0], q)
+
 		if d < n.threshold {
-			if d < n.threshold+*tau {
+			if d <= n.threshold+*tau {
 				n.left.search(q, tau, k, r)
 			}
 			if d >= n.threshold-*tau {
@@ -43,18 +44,13 @@ func (n *node) search(q uint64, tau *uint64, k int, r *Results) {
 				n.left.search(q, tau, k, r)
 			}
 		}
+
 	}
 }
 
 func (n *node) add(item uint64) {
 	if n.left == nil {
 		if len(n.items) < itemsLimit {
-			// deduplicate
-			for i := 0; i < len(n.items); i++ {
-				if item == n.items[0] {
-					return
-				}
-			}
 			// add item
 			n.items = append(n.items, item)
 			return

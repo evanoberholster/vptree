@@ -3,15 +3,19 @@ package vptree
 import (
 	"bufio"
 	"encoding/binary"
+	"math/rand"
 	"os"
 	"testing"
 )
 
 const (
 	testCount        = 1000000
-	testQuery uint64 = 9499926864262602905
-	testTau   uint64 = 20
-	testK            = 10
+	query     uint64 = 9716099646001308040
+	k                = 10
+)
+
+var (
+	tau uint64 = 0
 )
 
 func readDB() []uint64 {
@@ -41,140 +45,110 @@ var arr []uint64
 
 func init() {
 	vp = NewVPTree()
-	arr = readDB()
-	for i := 0; i < len(arr); i++ {
-		vp.Add(arr[i])
+	//arr = readDB()
+	//for i := 0; i < len(arr); i++ {
+	//	vp.Add(arr[i])
+	//}
+	arr = make([]uint64, 0, testCount)
+	for i := 0; i < testCount; i++ {
+		n := rand.Uint64()
+		arr = append(arr, n)
+		vp.Add(n)
 	}
 }
 
 func BenchmarkLinearSearch(b *testing.B) {
-	query2 := uint64(16422160614500647000)
-	tau := uint64(4)
 
 	b.ResetTimer()
 	b.ReportAllocs()
 	b.Run("2", func(b *testing.B) {
 		tau = 2
 		for i := 0; i < b.N; i++ {
-			LinearSearch(arr, query2, tau, testK)
+			LinearSearch(arr, query, tau, k)
 		}
 	})
 	b.Run("4", func(b *testing.B) {
 		tau = 4
 		for i := 0; i < b.N; i++ {
-			LinearSearch(arr, query2, tau, testK)
+			LinearSearch(arr, query, tau, k)
 		}
 	})
 	b.Run("6", func(b *testing.B) {
 		tau = 6
 		for i := 0; i < b.N; i++ {
-			LinearSearch(arr, query2, tau, testK)
+			LinearSearch(arr, query, tau, k)
 		}
 	})
 	b.Run("8", func(b *testing.B) {
 		tau = 8
 		for i := 0; i < b.N; i++ {
-			LinearSearch(arr, query2, tau, testK)
+			LinearSearch(arr, query, tau, k)
 		}
 	})
 	b.Run("10", func(b *testing.B) {
 		tau = 10
 		for i := 0; i < b.N; i++ {
-			LinearSearch(arr, query2, tau, testK)
+			LinearSearch(arr, query, tau, k)
 		}
 	})
 	b.Run("12", func(b *testing.B) {
 		tau = 12
 		for i := 0; i < b.N; i++ {
-			LinearSearch(arr, query2, tau, testK)
+			LinearSearch(arr, query, tau, k)
 		}
 	})
 	b.Run("14", func(b *testing.B) {
 		tau = 14
 		for i := 0; i < b.N; i++ {
-			LinearSearch(arr, query2, tau, testK)
+			LinearSearch(arr, query, tau, k)
 		}
 	})
 }
 
-func BenchmarkSearch(b *testing.B) {
-	query2 := uint64(16422160614500647000)
-	tau := uint64(4)
+func BenchmarkVPSearch(b *testing.B) {
 
 	b.ResetTimer()
 	b.ReportAllocs()
 	b.Run("2", func(b *testing.B) {
 		tau = 2
 		for i := 0; i < b.N; i++ {
-			vp.Search(query2, tau, testK)
+			vp.Search(query, tau, k)
 		}
 	})
 	b.Run("4", func(b *testing.B) {
 		tau = 4
 		for i := 0; i < b.N; i++ {
-			vp.Search(query2, tau, testK)
+			vp.Search(query, tau, k)
 		}
 	})
 	b.Run("6", func(b *testing.B) {
 		tau = 6
 		for i := 0; i < b.N; i++ {
-			vp.Search(query2, tau, testK)
+			vp.Search(query, tau, k)
 		}
 	})
 	b.Run("8", func(b *testing.B) {
 		tau = 8
 		for i := 0; i < b.N; i++ {
-			vp.Search(query2, tau, testK)
+			vp.Search(query, tau, k)
 		}
 	})
 	b.Run("10", func(b *testing.B) {
 		tau = 10
 		for i := 0; i < b.N; i++ {
-			vp.Search(query2, tau, testK)
+			vp.Search(query, tau, k)
 		}
 	})
 	b.Run("12", func(b *testing.B) {
 		tau = 12
 		for i := 0; i < b.N; i++ {
-			vp.Search(query2, tau, testK)
+			vp.Search(query, tau, k)
 		}
 	})
 	b.Run("14", func(b *testing.B) {
 		tau = 14
 		for i := 0; i < b.N; i++ {
-			vp.Search(query2, tau, testK)
+			vp.Search(query, tau, k)
 		}
 	})
 }
-
-// BenchmarkSearch/16-12 	   27498	     43427 ns/op	    1544 B/op	      71 allocs/op
-
-// BenchmarkSearch/16-12 	   23143	     49293 ns/op	    1400 B/op	      62 allocs/op
-
-// BenchmarkSearch/16-12 	    1249	    986074 ns/op	    1848 B/op	      90 allocs/op
-
-// BenchmarkSearch/16-12 	    1216	    983878 ns/op	     656 B/op	      11 allocs/op
-
-// BenchmarkSearch/16-12 	    1212	    969849 ns/op	     176 B/op	       4 allocs/op
-
-// 2048
-// BenchmarkSearch/16-12 	    1262	    930683 ns/op	     160 B/op	       4 allocs/op
-
-// 4096
-// BenchmarkSearch/16-12 	    1340	    905357 ns/op	     160 B/op	       4 allocs/op
-
-// 1024
-// BenchmarkSearch/16-12 	    1098	    948374 ns/op	     160 B/op	       4 allocs/op
-
-// 512
-// BenchmarkSearch/16-12 	    1212	    979466 ns/op	     160 B/op	       4 allocs/op
-
-// 256
-// BenchmarkSearch/16-12 	     964	   1037699 ns/op	     160 B/op	       4 allocs/op
-
-// 128
-// BenchmarkSearch/16-12 	     994	   1211728 ns/op	     160 B/op	       4 allocs/op
-
-//cpu: AMD Ryzen 5 5600X 6-Core Processor
-//BenchmarkSearch/16-12   	    1167	   1045384 ns/op	     160 B/op	       4 allocs/op
-//BenchmarkSimStore/16-12 	      79	  14379709 ns/op	    2816 B/op	      94 allocs/op
