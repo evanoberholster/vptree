@@ -3,10 +3,15 @@
 // It is ideally suited for image similarity using an uint64 hash
 package vptree
 
-import "sort"
+import (
+	"sort"
+	"sync"
+)
 
 // VPTree is a vantage point tree
 type VPTree struct {
+	m    sync.RWMutex
+	ch   chan uint64
 	root *node
 }
 
@@ -57,5 +62,40 @@ func LinearSearch(arr []uint64, query uint64, tau uint64, k int) (r *Results) {
 
 	sort.Sort(sort.Reverse(r))
 
+	return
+}
+
+// NewVPTreeConcurrent returns a new VPTree with locking features
+func NewVPTreeConcurrent() *VPTree {
+	vp := &VPTree{
+		root: &node{},
+		ch:   make(chan uint64, itemsLimit/2),
+	}
+	go func() {
+		for item := range vp.ch {
+			vp.m.Lock()
+			vp.root.add(item)
+			vp.m.Unlock()
+		}
+	}()
+	return vp
+}
+
+func (vp *VPTree) Close() {
+	close(vp.ch)
+}
+
+func (vp *VPTree) AddConcurrent(item uint64) {
+	vp.ch <- item
+}
+
+func (vp *VPTree) SearchConcurrent(query uint64, tau uint64, k int) (r *Results) {
+	r = newResults(k)
+
+	vp.m.RLock()
+	vp.root.search(query, &tau, k, r)
+	vp.m.RUnlock()
+
+	sort.Sort(sort.Reverse(r))
 	return
 }
